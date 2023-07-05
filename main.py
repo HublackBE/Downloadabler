@@ -21,6 +21,7 @@ def main():
 
     #Download function
     def download(url, name, format):
+        progress['value'] = 0
         path = filedialog.askdirectory(initialdir='/Downloads', title='Choose Location')
         if path == "":
             return
@@ -47,11 +48,10 @@ def main():
             YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
             author = YouTube(url).author
             progress['value'] = 50
-            YouTube(url).streams.filter(only_video=True).order_by('resolution').desc().first().download(filename = f'{name}.mp4', output_path = f'{path}')
+            YouTube(url).streams.filter(only_video=True).order_by('resolution').desc().first().download(filename = f'video.mp4', output_path = f'{path}')
             progress['value'] = 75
-            os.system(f'ffmpeg -i "{path}/{name}.mp4" -i "{path}/audio.webm" -c copy -map 0:v:0 -map 1:a "{path}/temp.mp4"')
-            os.remove(f'{path}/{name}.mp4')
-            os.rename(f'{path}/temp.mp4', f'{path}/{name}.mp4')
+            os.system(f'ffmpeg -i "{path}/video.mp4" -i "{path}/audio.webm" -c copy -map 0:v:0 -map 1:a "{path}/{name}.mp4"')
+            os.remove(f'{path}/video.mp4')
             os.remove(f'{path}/audio.webm')
         progress['value'] = 100
 
