@@ -25,11 +25,13 @@ def main():
         path = filedialog.askdirectory(initialdir='/Downloads', title='Choose Location')
         if path == "":
             return
-        #progressValue()
-        progress['value'] = 25
-        YouTube(url).bypass_age_gate()
+        progress['value'] = 25  #progressValue()
+        #YouTube(url).bypass_age_gate()
         if name == "":
             name = YouTube(url).title
+        bad_char = ["<", ">", ":", "\"", "/", "\\", "|", "?", "*"]
+        for i in bad_char:
+            name = name.replace(i, '')
         if format == 'audio only (mp3)' or format == 'audio only (ogg)':
             YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
             author = YouTube(url).author
