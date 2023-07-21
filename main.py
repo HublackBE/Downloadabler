@@ -8,7 +8,7 @@ def main():
     #Root tkinter
     root = tk.Tk()
     root.iconbitmap(f'{os.path.dirname(os.path.realpath(__file__))}/icon.ico')
-    root.title('Downloader')
+    root.title('Downloadabler')
     root.geometry("600x700")
 
     #Frame tkinter
