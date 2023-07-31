@@ -34,30 +34,31 @@ def main():
 
     url = tk.StringVar()
     name = tk.StringVar()
+    author = tk.StringVar()
     format = tk.StringVar()
 
     #Download function
-    def download(url, name, format):
+    def download(url, name, author, format):
         progress['value'] = 0
         path = filedialog.askdirectory(initialdir='/Downloads', title='Choose Location')
         if path == "":
             return
         progress['value'] = 25  #progressValue()
         #YouTube(url).bypass_age_gate()
-        if name == "":
+        if name == "Name":
             name = YouTube(url).title
         bad_char = ["<", ">", ":", "\"", "/", "\\", "|", "?", "*"]
         for i in bad_char:
             name = name.replace(i, '')
+        if author == "Author":
+            author = YouTube(url).author
         if format == 'audio only (mp3)' or format == 'audio only (ogg)':
             YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
-            author = YouTube(url).author
             progress['value'] = 75
             os.system(f'ffmpeg -i "{path}/audio.webm" -map 0:a -metadata title="{name}" -metadata artist="{author}" -metadata album="{name}" "{path}/{name}.{format[-4:-1]}"')
             os.remove(f'{path}/audio.webm')
         if format == 'audio only (webm)':
             YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
-            author = YouTube(url).author
             progress['value'] = 75
             os.system(f'ffmpeg -i "{path}/audio.webm" -map 0:a -metadata title="{name}" -metadata artist="{author}" -metadata album="{name}" "{path}/{name}.webm"')
             os.remove(f'{path}/audio.webm')
@@ -67,7 +68,6 @@ def main():
             YouTube(url).streams.filter(only_video=True).order_by('resolution').desc().first().download(filename = f'{name}.{format[-5:-1]}', output_path = f'{path}')
         if format == 'video + audio (mp4 + mp3)' or format == 'video + audio (mkv + mp3)':
             YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
-            author = YouTube(url).author
             progress['value'] = 50
             YouTube(url).streams.filter(only_video=True).order_by('resolution').desc().first().download(filename = f'video.{format[-10:-7]}', output_path = f'{path}')
             progress['value'] = 75
@@ -76,7 +76,6 @@ def main():
             os.remove(f'{path}/audio.webm')
         if format == 'video + audio (webm + mp3)':
             YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
-            author = YouTube(url).author
             progress['value'] = 50
             YouTube(url).streams.filter(only_video=True).order_by('resolution').desc().first().download(filename = f'video.{format[-11:-7]}', output_path = f'{path}')
             progress['value'] = 75
@@ -86,32 +85,75 @@ def main():
         progress['value'] = 100
 
 
-    #Name label
-    l1 = ttk.Label(frame, text='Name')
+    style = ttk.Style()
+    style.configure("Grey.TEntry", foreground="grey")
+
+    def In(event):
+        global changed
+        global saved_text
+        if 'changed' not in globals():
+            changed = {}
+        if 'saved_text' not in globals():
+            saved_text = {}
+        try: changed[event.widget]
+        except KeyError: changed[event.widget] = False
+        if changed[event.widget] is False:
+            saved_text[event.widget] = event.widget.get()
+            event.widget.delete(0,"end")
+            event.widget.configure(style="TEntry")
+    
+    def Out(event):
+        global changed
+        if event.widget.get() == "":
+            event.widget.configure(style="Grey.TEntry")
+            event.widget.insert(0, saved_text[event.widget])
+            changed[event.widget] = False
+        else:
+            event.widget.configure(style="TEntry")
+            changed[event.widget] = True
+
+    #URL label
+    l1 = ttk.Label(frame, text='URL')
     l1.pack()
+    url_entry = ttk.Entry(frame, textvariable=url, width=100)
+    url_entry.insert(0,"URL")
+    url_entry.configure(style="Grey.TEntry")
+    url_entry.pack()
+
+    #Name label
+    l2 = ttk.Label(frame, text='Name')
+    l2.pack()
 
     #Name text entry
     name_entry = ttk.Entry(frame, textvariable=name, width=75)
+    name_entry.insert(0,"Name")
+    name_entry.configure(style="Grey.TEntry")
     name_entry.pack()
 
-    l2 = ttk.Label(frame, text='URL')
-    l2.pack()
+    l3 = ttk.Label(frame, text="Author")
+    l3.pack()
 
-    url_entry = ttk.Entry(frame, textvariable=url, width=100)
-    url_entry.pack()
+    author_entry = ttk.Entry(frame, textvariable=author, width=50)
+    author_entry.insert(0,"Author")
+    author_entry.configure(style="Grey.TEntry")
+    author_entry.pack()
     
+    l4 = ttk.Label(frame, text="Type")
+    l4.pack()
+
     formats = ['video + audio (mp4 + mp3)', 'video + audio (mkv + mp3)', 'video + audio (webm + mp3)', 'video only (mp4)', 'video only (mkv)', 'video only (webm)', 'audio only (mp3)', 'audio only (ogg)', 'audio only (webm)']
 
     menu = ttk.Combobox(frame, state = 'readonly', textvariable=format, values = formats, width=25)
     menu.current(0)
     menu.pack()
 
-    button = ttk.Button(frame, text = "Download", command = lambda: download(url.get(), name.get(), format.get()))
+    button = ttk.Button(frame, text = "Download", command = lambda: download(url.get(), name.get(), author.get(), format.get()))
     button.pack()
 
     progress = ttk.Progressbar(frame, length = 600)
     progress.pack(pady = 25)
-
+    root.bind_class("TEntry", "<FocusIn>", In)
+    root.bind_class("TEntry", "<FocusOut>", Out)
 
     root.mainloop()
 
