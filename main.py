@@ -52,7 +52,7 @@ def main():
             name = name.replace(i, '')
         if author == "Author":
             author = YouTube(url).author
-        if format == 'audio only (mp3)' or format == 'audio only (ogg)':
+        if format == 'audio only (mp3)' or format == 'audio only (ogg)' or format == 'audio only (wav)':
             YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
             progress['value'] = 75
             os.system(f'ffmpeg -i "{path}/audio.webm" -map 0:a -metadata title="{name}" -metadata artist="{author}" -metadata album="{name}" "{path}/{name}.{format[-4:-1]}"')
@@ -141,7 +141,7 @@ def main():
     l4 = ttk.Label(frame, text="Type")
     l4.pack()
 
-    formats = ['video + audio (mp4 + mp3)', 'video + audio (mkv + mp3)', 'video + audio (webm + mp3)', 'video only (mp4)', 'video only (mkv)', 'video only (webm)', 'audio only (mp3)', 'audio only (ogg)', 'audio only (webm)']
+    formats = ['video + audio (mp4 + mp3)', 'video + audio (mkv + mp3)', 'video + audio (webm + mp3)', 'video only (mp4)', 'video only (mkv)', 'video only (webm)', 'audio only (mp3)', 'audio only (ogg)', 'audio only (wav)', 'audio only (webm)']
 
     menu = ttk.Combobox(frame, state = 'readonly', textvariable=format, values = formats, width=25)
     menu.current(0)
