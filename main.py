@@ -56,6 +56,10 @@ def main():
             YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
             progress['value'] = 75
             os.system(f'ffmpeg -i "{path}/audio.webm" -map 0:a -metadata title="{name}" -metadata artist="{author}" -metadata album="{name}" "{path}/{name}.{format[-4:-1]}"')
+            if imagePath is None:
+                os.system(f'ffmpeg -i "{path}/audio.webm" -map 0:a -metadata title="{name}" -metadata artist="{author}" -metadata album="{name}" "{path}/{name}.{format[-4:-1]}"')
+            else:
+                os.system(f'ffmpeg -i "{path}/audio.webm" -i "{imagePath}" -map 0:a -map 1 -id3v2_version 3 -metadata title="{name}" -metadata artist="{author}" -metadata album="{name}" "{path}/{name}.{format[-4:-1]}"')
             os.remove(f'{path}/audio.webm')
         if format == 'audio only (webm)':
             YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
@@ -112,6 +116,16 @@ def main():
             event.widget.configure(style="TEntry")
             changed[event.widget] = True
 
+    def Choice(event):
+        if format == 'audio only (mp3)':
+            imageButton.configure(state="ENABLED")
+        else:
+            imageButton.configure(state="NORMAL")
+
+    def ChooseImage():
+        global imagePath
+        imagePath = filedialog.askopenfilename(initialdir='/Downloads', title='Choose Image', filetypes=('png .png', 'jpg .jpg'))
+
     #URL label
     l1 = ttk.Label(frame, text='URL')
     l1.pack()
@@ -144,11 +158,15 @@ def main():
     formats = ['video + audio (mp4 + mp3)', 'video + audio (mkv + mp3)', 'video + audio (webm + mp3)', 'video only (mp4)', 'video only (mkv)', 'video only (webm)', 'audio only (mp3)', 'audio only (ogg)', 'audio only (wav)', 'audio only (webm)']
 
     menu = ttk.Combobox(frame, state = 'readonly', textvariable=format, values = formats, width=25)
+    menu.bind('<<ComboboxSelected>>', Choice)
     menu.current(0)
     menu.pack()
 
     button = ttk.Button(frame, text = "Download", command = lambda: download(url.get(), name.get(), author.get(), format.get()))
     button.pack()
+
+    imageButton = ttk.Button(frame, text = "Choose Image", state='DISABLED', command = lambda: ChooseImage())
+    imageButton.pack()
 
     progress = ttk.Progressbar(frame, length = 600)
     progress.pack(pady = 25)
