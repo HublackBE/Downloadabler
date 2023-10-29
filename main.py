@@ -117,10 +117,10 @@ def main():
             changed[event.widget] = True
 
     def Choice(event):
-        if format == 'audio only (mp3)':
-            imageButton.configure(state="ENABLED")
+        if format.get() == 'audio only (mp3)':
+            imageButton.configure(state='normal')
         else:
-            imageButton.configure(state="NORMAL")
+            imageButton.configure(state='disabled')
 
     def ChooseImage():
         global imagePath
@@ -162,11 +162,14 @@ def main():
     menu.current(0)
     menu.pack()
 
-    button = ttk.Button(frame, text = "Download", command = lambda: download(url.get(), name.get(), author.get(), format.get()))
-    button.pack()
+    l5 = ttk.Label(frame, text="Cover Art")
+    l5.pack(pady= (5, 0))
 
-    imageButton = ttk.Button(frame, text = "Choose Image", state='DISABLED', command = lambda: ChooseImage())
+    imageButton = ttk.Button(frame, text = "Choose Image", width=15, state='disabled', command = lambda: ChooseImage())
     imageButton.pack()
+
+    downloadButton = ttk.Button(frame, text = "Download", command = lambda: download(url.get(), name.get(), author.get(), format.get()))
+    downloadButton.pack(pady= (25, 0))
 
     progress = ttk.Progressbar(frame, length = 600)
     progress.pack(pady = 25)
