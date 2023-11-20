@@ -121,8 +121,8 @@ def main():
         else:
             imageButton.configure(state='disabled')
 
+    imagePath = None
     def ChooseImage():
-        global imagePath
         imagePath = filedialog.askopenfilename(initialdir='/Downloads', title='Choose Image', filetypes=('png .png', 'jpg .jpg'))
 
     #URL label
