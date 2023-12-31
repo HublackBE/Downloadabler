@@ -37,6 +37,10 @@ def main():
     author = tk.StringVar()
     format = tk.StringVar()
 
+    def ChooseImage():
+        global imagePath
+        imagePath = filedialog.askopenfilename(initialdir='/Downloads', title='Choose Image', filetypes=('png .png', 'jpg .jpg'))
+
     #Download function
     def download(url, name, author, format):
         progress['value'] = 0
@@ -55,10 +59,10 @@ def main():
         if format == 'audio only (mp3)' or format == 'audio only (ogg)' or format == 'audio only (wav)':
             YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
             progress['value'] = 75
-            if imagePath is None:
-                os.system(f'ffmpeg -i "{path}/audio.webm" -map 0:a -metadata title="{name}" -metadata artist="{author}" -metadata album="{name}" "{path}/{name}.{format[-4:-1]}"')
-            else:
+            try:
                 os.system(f'ffmpeg -i "{path}/audio.webm" -i "{imagePath}" -map 0:a -map 1 -id3v2_version 3 -metadata title="{name}" -metadata artist="{author}" -metadata album="{name}" "{path}/{name}.{format[-4:-1]}"')
+            except:
+                os.system(f'ffmpeg -i "{path}/audio.webm" -map 0:a -metadata title="{name}" -metadata artist="{author}" -metadata album="{name}" "{path}/{name}.{format[-4:-1]}"')
             os.remove(f'{path}/audio.webm')
         if format == 'audio only (webm)':
             YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
@@ -120,11 +124,8 @@ def main():
             imageButton.configure(state='normal')
         else:
             imageButton.configure(state='disabled')
-
-    imagePath = None
-    def ChooseImage():
-        imagePath = filedialog.askopenfilename(initialdir='/Downloads', title='Choose Image', filetypes=('png .png', 'jpg .jpg'))
-
+    
+    
     #URL label
     l1 = ttk.Label(frame, text='URL')
     l1.pack()
