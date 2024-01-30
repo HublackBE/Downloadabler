@@ -17,6 +17,7 @@
 
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 import tkinter.ttk as ttk
 from pytube import YouTube
 import os
@@ -50,50 +51,58 @@ def main():
         progress['value'] = 25  #progressValue()
         #YouTube(url).bypass_age_gate()
         if name == "Name":
-            name = YouTube(url).title
+            try: name = YouTube(url).title
+            except: errorBox()
         bad_char = ["<", ">", ":", "\"", "/", "\\", "|", "?", "*"]
         for i in bad_char:
             name = name.replace(i, '')
         if author == "Author":
-            author = YouTube(url).author
+            try: author = YouTube(url).author
+            except: errorBox()
         if format == 'audio only (mp3)' or format == 'audio only (ogg)' or format == 'audio only (wav)':
-            YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
+            try: YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
+            except: errorBox()
             progress['value'] = 75
-            try:
-                os.system(f'ffmpeg -i "{path}/audio.webm" -i "{imagePath}" -map 0:a -map 1 -id3v2_version 3 -metadata title="{name}" -metadata artist="{author}" -metadata album="{name}" "{path}/{name}.{format[-4:-1]}"')
-            except:
-                os.system(f'ffmpeg -i "{path}/audio.webm" -map 0:a -metadata title="{name}" -metadata artist="{author}" -metadata album="{name}" "{path}/{name}.{format[-4:-1]}"')
+            try: os.system(f'ffmpeg -i "{path}/audio.webm" -i "{imagePath}" -map 0:a -map 1 -id3v2_version 3 -metadata title="{name}" -metadata artist="{author}" -metadata album="{name}" "{path}/{name}.{format[-4:-1]}"')
+            except: os.system(f'ffmpeg -i "{path}/audio.webm" -map 0:a -metadata title="{name}" -metadata artist="{author}" -metadata album="{name}" "{path}/{name}.{format[-4:-1]}"')
             os.remove(f'{path}/audio.webm')
         if format == 'audio only (webm)':
-            YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
+            try: YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
+            except: errorBox()
             progress['value'] = 75
-            os.system(f'ffmpeg -i "{path}/audio.webm" -map 0:a -metadata title="{name}" -metadata artist="{author}" -metadata album="{name}" "{path}/{name}.webm"')
-            os.remove(f'{path}/audio.webm')
+            try: 
+                os.system(f'ffmpeg -i "{path}/audio.webm" -map 0:a -metadata title="{name}" -metadata artist="{author}" -metadata album="{name}" "{path}/{name}.webm"')
+                os.remove(f'{path}/audio.webm')
+            except: errorBox()
         if format == 'video only (mp4)' or format == 'video only (mkv)':
-            YouTube(url).streams.filter(only_video=True).order_by('resolution').desc().first().download(filename = f'{name}.{format[-4:-1]}', output_path = f'{path}')
+            try: YouTube(url).streams.filter(only_video=True).order_by('resolution').desc().first().download(filename = f'{name}.{format[-4:-1]}', output_path = f'{path}')
+            except: errorBox()
         if format == 'video only (webm)':
-            YouTube(url).streams.filter(only_video=True).order_by('resolution').desc().first().download(filename = f'{name}.{format[-5:-1]}', output_path = f'{path}')
+            try: YouTube(url).streams.filter(only_video=True).order_by('resolution').desc().first().download(filename = f'{name}.{format[-5:-1]}', output_path = f'{path}')
+            except: errorBox()
         if format == 'video + audio (mp4 + mp3)' or format == 'video + audio (mkv + mp3)':
-            YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
+            try: YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
+            except: errorBox()
             progress['value'] = 50
-            YouTube(url).streams.filter(only_video=True).order_by('resolution').desc().first().download(filename = f'video.{format[-10:-7]}', output_path = f'{path}')
+            try: YouTube(url).streams.filter(only_video=True).order_by('resolution').desc().first().download(filename = f'video.{format[-10:-7]}', output_path = f'{path}')
+            except: errorBox()
             progress['value'] = 75
-            os.system(f'ffmpeg -i "{path}/video.{format[-10:-7]}" -i "{path}/audio.webm" -c copy -map 0:v:0 -map 1:a "{path}/{name}.{format[-10:-7]}"')
+            try: os.system(f'ffmpeg -i "{path}/video.{format[-10:-7]}" -i "{path}/audio.webm" -c copy -map 0:v:0 -map 1:a "{path}/{name}.{format[-10:-7]}"')
+            except: errorBox()
             os.remove(f'{path}/video.{format[-10:-7]}')
             os.remove(f'{path}/audio.webm')
         if format == 'video + audio (webm + mp3)':
-            YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
+            try: YouTube(url).streams.filter(only_audio=True).order_by('abr').desc().first().download(filename = f'audio.webm', output_path = f'{path}')
+            except: errorBox()
             progress['value'] = 50
-            YouTube(url).streams.filter(only_video=True).order_by('resolution').desc().first().download(filename = f'video.{format[-11:-7]}', output_path = f'{path}')
+            try: YouTube(url).streams.filter(only_video=True).order_by('resolution').desc().first().download(filename = f'video.{format[-11:-7]}', output_path = f'{path}')
+            except: errorBox()
             progress['value'] = 75
-            os.system(f'ffmpeg -i "{path}/video.{format[-11:-7]}" -i "{path}/audio.webm" -c copy -map 0:v:0 -map 1:a "{path}/{name}.{format[-11:-7]}"')
+            try: os.system(f'ffmpeg -i "{path}/video.{format[-11:-7]}" -i "{path}/audio.webm" -c copy -map 0:v:0 -map 1:a "{path}/{name}.{format[-11:-7]}"')
+            except: errorBox()
             os.remove(f'{path}/video.{format[-11:-7]}')
             os.remove(f'{path}/audio.webm')
         progress['value'] = 100
-
-
-    style = ttk.Style()
-    style.configure("Grey.TEntry", foreground="grey")
 
     def In(event):
         global changed
@@ -124,6 +133,11 @@ def main():
             imageButton.configure(state='normal')
         else:
             imageButton.configure(state='disabled')
+
+    def errorBox():
+        messagebox.showerror("Unexpected Error", "An Unexpected Error occured.")
+        progress.configure(style="red.Horizontal.TProgressbar")
+        raise Exception("An Unexpected Error occured")
     
     
     #URL label
@@ -175,6 +189,9 @@ def main():
     progress.pack(pady = 25)
     root.bind_class("TEntry", "<FocusIn>", In)
     root.bind_class("TEntry", "<FocusOut>", Out)
+
+    style = ttk.Style()
+    style.configure("Grey.TEntry", foreground="grey")
 
     root.mainloop()
 
