@@ -1,5 +1,5 @@
 # Downloadabler is a personal project of mine(Hublack) that helps download and convert videos from YouTube
-# Copyright (C) 2023  Hublack
+# Copyright (C) 2024  Hublack
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
