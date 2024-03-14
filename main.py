@@ -41,11 +41,12 @@ def main():
 
     def ChooseImage():
         global imagePath
-        imagePath = filedialog.askopenfilename(initialdir='/Downloads', title='Choose Image', filetypes=('png .png', 'jpg .jpg'))
+        imagePath = filedialog.askopenfilename(initialdir='/Downloads', title='Choose Image', filetypes=(("Image file",".png .jpg .jpeg"),("All files",".*")))
 
     #Download function
     def download(url, name, author, format):
         progress['value'] = 0
+        progress.start(500)
         path = filedialog.askdirectory(initialdir='/Downloads', title='Choose Location')
         if path == "":
             return
@@ -103,6 +104,7 @@ def main():
             except: errorBox()
             os.remove(f'{path}/video.{format[-11:-7]}')
             os.remove(f'{path}/audio.webm')
+        progress.stop()
         progress['value'] = 100
 
     def In(event):
@@ -137,7 +139,6 @@ def main():
 
     def errorBox():
         messagebox.showerror("Unexpected Error", "An Unexpected Error occured.")
-        progress.configure(style="red.Horizontal.TProgressbar")
         raise Exception("An Unexpected Error occured")
     
     
@@ -180,7 +181,7 @@ def main():
     l5 = ttk.Label(frame, text="Cover Art")
     l5.pack(pady= (5, 0))
 
-    imageButton = ttk.Button(frame, text = "Choose Image", width=15, state='disabled', command = lambda: ChooseImage())
+    imageButton = ttk.Button(frame, text = "Choose Image", width=15, state='disabled', command = lambda: Thread(ChooseImage()))
     imageButton.pack()
 
     downloadButton = ttk.Button(frame, text = "Download", command = lambda: Thread(target = download, args=(url.get(), name.get(), author.get(), format.get())).start())
@@ -198,4 +199,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    Thread(main())
